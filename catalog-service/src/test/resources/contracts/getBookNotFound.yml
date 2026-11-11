@@ -1,0 +1,12 @@
+description: Sách không có trong danh mục → 404 Problem Details (book-not-found)
+name: getBookNotFound
+request:
+  method: GET
+  url: /api/v1/books/9789999999999
+response:
+  status: 404
+  headers:
+    Content-Type: application/problem+json
+  body:
+    type: "https://api.bookstore.vn/problems/book-not-found"
+    status: 404

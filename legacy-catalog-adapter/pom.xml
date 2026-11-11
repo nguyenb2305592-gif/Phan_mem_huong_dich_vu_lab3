@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>vn.edu.bookstore</groupId>
+    <artifactId>bookstore-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>legacy-catalog-adapter</artifactId>
+  <name>legacy-catalog-adapter (REST boc SOAP, tang chong an mon)</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    <!-- Jakarta XML Web Services (Metro) — client sinh từ WSDL -->
+    <dependency>
+      <groupId>com.sun.xml.ws</groupId>
+      <artifactId>jaxws-rt</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Khởi động dịch vụ SOAP kế thừa thật ngay trong kiểm thử -->
+    <dependency>
+      <groupId>vn.edu.bookstore</groupId>
+      <artifactId>legacy-bookcatalog-soap</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.sun.xml.ws</groupId>
+        <artifactId>jaxws-maven-plugin</artifactId>
+        <version>${jaxws.version}</version>
+        <executions>
+          <execution>
+            <id>wsimport-client</id>
+            <goals><goal>wsimport</goal></goals>
+            <configuration>
+              <!-- TH1-4: WSDL do "đối tác" cung cấp, đặt trong src/main/resources/wsdl -->
+              <wsdlDirectory>${project.basedir}/src/main/resources/wsdl</wsdlDirectory>
+              <wsdlFiles><wsdlFile>BookCatalogService.wsdl</wsdlFile></wsdlFiles>
+              <wsdlLocation>/wsdl/BookCatalogService.wsdl</wsdlLocation>
+              <packageName>vn.edu.bookstore.legacy.adapter.soap.generated</packageName>
+              <xnocompile>true</xnocompile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>

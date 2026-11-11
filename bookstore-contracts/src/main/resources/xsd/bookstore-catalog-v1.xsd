@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Lược đồ dữ liệu danh mục sách BookStore, phiên bản 1.
+  Namespace: http://bookstore.edu.vn/catalog/v1 (tiền tố bs).
+  Dùng chung cho dịch vụ SOAP kế thừa BookCatalogService và các bên tiêu thụ.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:bs="http://bookstore.edu.vn/catalog/v1"
+           targetNamespace="http://bookstore.edu.vn/catalog/v1"
+           elementFormDefault="qualified"
+           version="1.0">
+
+  <!-- ISBN-13 bắt đầu bằng 978 hoặc 979, tổng 13 chữ số -->
+  <xs:simpleType name="Isbn13">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="97[89][0-9]{10}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="CurrencyCode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="VND"/>
+      <xs:enumeration value="USD"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Số tiền: không âm, tối đa 2 chữ số thập phân (Java: BigDecimal, không dùng double) -->
+  <xs:simpleType name="Amount">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0"/>
+      <xs:fractionDigits value="2"/>
+      <xs:totalDigits value="15"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="Money">
+    <xs:sequence>
+      <xs:element name="amount" type="bs:Amount"/>
+      <xs:element name="currency" type="bs:CurrencyCode"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Book">
+    <xs:sequence>
+      <xs:element name="isbn" type="bs:Isbn13"/>
+      <xs:element name="title">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="255"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="author" type="xs:string"/>
+      <xs:element name="authorId" type="xs:positiveInteger" minOccurs="0"/>
+      <xs:element name="publishedYear" type="xs:gYear" minOccurs="0"/>
+      <xs:element name="price" type="bs:Money"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Chi tiết lỗi đặt trong soap:Fault/detail -->
+  <xs:complexType name="ErrorDetail">
+    <xs:sequence>
+      <xs:element name="code" type="xs:string"/>
+      <xs:element name="message" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="Book" type="bs:Book"/>
+  <xs:element name="ErrorDetail" type="bs:ErrorDetail"/>
+</xs:schema>

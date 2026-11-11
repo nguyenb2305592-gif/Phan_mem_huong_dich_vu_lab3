@@ -1,0 +1,48 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+  cloud:
+    gateway:
+      server:
+        webflux:
+          # TH3-1: bảng định tuyến; lb:// = tra Eureka để chọn phiên bản dịch vụ
+          routes:
+            - id: catalog
+              uri: ${bookstore.routes.catalog:lb://catalog-service}
+              predicates:
+                - Path=/api/v1/books/**
+            # TODO(TH3-1): thêm tuyến "orders" (/api/v1/orders/** → lb://order-service)
+            #              và "inventory" (/api/v1/inventory/** → lb://inventory-service),
+            #              uri dạng ${bookstore.routes.orders:lb://order-service} để kiểm thử ghi đè được
+            - id: orders
+              uri: ${bookstore.routes.orders:lb://order-service}
+              predicates:
+                - Path=/api/v1/orders/**
+            - id: inventory
+              uri: ${bookstore.routes.inventory:lb://inventory-service}
+              predicates:
+                - Path=/api/v1/inventory/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway,prometheus,metrics
+  endpoint:
+    gateway:
+      access: read-only
+    health:
+      probes:
+        enabled: true

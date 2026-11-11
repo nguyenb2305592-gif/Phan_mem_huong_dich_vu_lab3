@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bs:Book xmlns:bs="http://bookstore.edu.vn/catalog/v1">
+  <bs:isbn>9780134685991</bs:isbn>
+  <bs:title>Effective Java</bs:title>
+  <bs:author>Joshua Bloch</bs:author>
+  <bs:authorId>42</bs:authorId>
+  <bs:publishedYear>2018</bs:publishedYear>
+  <bs:price>
+    <bs:amount>285000.00</bs:amount>
+    <bs:currency>EUR</bs:currency>
+  </bs:price>
+</bs:Book>

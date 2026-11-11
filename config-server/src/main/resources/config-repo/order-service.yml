@@ -1,0 +1,11 @@
+# Cấu hình riêng của order-service (ghi đè application.yml trong jar)
+bookstore:
+  catalog:
+    connect-timeout: 1s
+    read-timeout: 2s
+    circuit-breaker:
+      sliding-window-size: 10
+      minimum-number-of-calls: 5
+      failure-rate-threshold: 50
+      slow-call-duration-threshold: 1500ms
+      wait-duration-in-open-state: 15s

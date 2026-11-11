@@ -1,0 +1,4 @@
+# Cấu hình riêng của catalog-service
+info:
+  service:
+    description: Danh mục sách (REST, API-first)

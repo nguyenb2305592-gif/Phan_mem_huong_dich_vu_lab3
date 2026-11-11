@@ -1,0 +1,4 @@
+# Cấu hình riêng của api-gateway
+info:
+  service:
+    description: Cổng API (Spring Cloud Gateway)

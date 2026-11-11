@@ -1,0 +1,21 @@
+name: ci
+# Pipeline tối thiểu cho bài thực hành: mọi push/PR phải chạy xanh ./mvnw -B verify
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Build và kiểm thử (gồm Testcontainers nếu có)
+        run: |
+          chmod +x mvnw
+          ./mvnw -B verify

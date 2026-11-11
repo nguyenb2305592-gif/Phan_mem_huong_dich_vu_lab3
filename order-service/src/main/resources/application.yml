@@ -1,0 +1,68 @@
+server:
+  port: 8082
+  shutdown: graceful
+
+spring:
+  application:
+    name: order-service
+  config:
+    # Cấu hình tập trung (TH3); "optional:" để dịch vụ vẫn chạy được khi config-server chưa bật
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+  datasource:
+    url: ${ORDER_DB_URL:jdbc:postgresql://localhost:5434/order}
+    username: ${ORDER_DB_USER:order}
+    password: ${ORDER_DB_PASSWORD:order-lab}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  mvc:
+    problemdetails:
+      enabled: true
+  cloud:
+    circuitbreaker:
+      resilience4j:
+        # chạy lời gọi trên CÙNG luồng (giữ ngữ cảnh truy vết/bảo mật); timeout do RestClient đảm nhận
+        disable-thread-pool: true
+        disable-time-limiter: true
+      bulkhead:
+        resilience4j:
+          enabled: false
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    url: /openapi.yaml
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+bookstore:
+  catalog:
+    base-url: ${CATALOG_BASE_URL:http://catalog-service}
+    load-balanced: ${CATALOG_LOAD_BALANCED:true}
+    connect-timeout: 1s
+    read-timeout: 2s
+    circuit-breaker:
+      sliding-window-size: 10
+      minimum-number-of-calls: 5
+      failure-rate-threshold: 50
+      slow-call-duration-threshold: 1500ms
+      wait-duration-in-open-state: 15s

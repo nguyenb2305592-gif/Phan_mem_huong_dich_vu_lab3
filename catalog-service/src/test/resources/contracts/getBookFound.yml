@@ -1,0 +1,17 @@
+description: |
+  order-service cần isbn, title và price (amount + currency) của một sách có trong danh mục.
+name: getBookFound
+request:
+  method: GET
+  url: /api/v1/books/9780134685991
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  body:
+    isbn: "9780134685991"
+    title: "Effective Java"
+    author: "Joshua Bloch"
+    price:
+      amount: 285000.00
+      currency: "VND"

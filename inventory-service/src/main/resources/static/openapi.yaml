@@ -1,0 +1,55 @@
+openapi: 3.1.0
+info:
+  title: BookStore Inventory API
+  version: 1.0.0
+  description: API tồn kho (TH3). Giữ hàng/trả hàng diễn ra qua sự kiện ở TH5, không qua REST.
+servers:
+  - url: http://localhost:8083
+paths:
+  /api/v1/inventory/{isbn}:
+    parameters:
+      - name: isbn
+        in: path
+        required: true
+        schema: { type: string, pattern: '^97[89][0-9]{10}$' }
+    get:
+      operationId: getStock
+      responses:
+        '200':
+          description: Tồn kho hiện tại
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Stock' }
+        '404':
+          description: Chưa có tồn kho
+          content:
+            application/problem+json: { schema: { type: object } }
+    put:
+      operationId: adjustStock
+      description: Nhân viên kho điều chỉnh số lượng có sẵn (scope inventory.write từ TH4)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [available]
+              properties:
+                available: { type: integer, minimum: 0, maximum: 100000 }
+      responses:
+        '200':
+          description: Đã cập nhật
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Stock' }
+        '400':
+          description: Dữ liệu không hợp lệ
+components:
+  schemas:
+    Stock:
+      type: object
+      required: [isbn, available, reserved]
+      properties:
+        isbn: { type: string }
+        available: { type: integer }
+        reserved: { type: integer }

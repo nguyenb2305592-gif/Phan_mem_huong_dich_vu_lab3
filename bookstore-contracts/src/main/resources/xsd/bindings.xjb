@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ánh xạ namespace XML sang gói Java -->
+<jaxb:bindings xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
+               xmlns:xs="http://www.w3.org/2001/XMLSchema"
+               version="3.0">
+  <jaxb:bindings schemaLocation="bookstore-catalog-v1.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="vn.edu.bookstore.contracts.catalog"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <jaxb:bindings schemaLocation="bookstore-order-v1.xsd" node="/xs:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="vn.edu.bookstore.contracts.order"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+</jaxb:bindings>

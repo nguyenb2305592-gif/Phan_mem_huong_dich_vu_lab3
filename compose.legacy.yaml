@@ -1,0 +1,13 @@
+# Chạy dịch vụ SOAP kế thừa BookCatalogService (được cung cấp sẵn)
+#   docker compose -f compose.legacy.yaml up -d --build
+# Đổi cổng máy chủ nếu 8091 đã bận: LEGACY_SOAP_PORT=18091 docker compose -f compose.legacy.yaml up -d
+name: bookstore
+services:
+  legacy-bookcatalog-soap:
+    build: ./legacy-bookcatalog-soap
+    image: bookstore/legacy-bookcatalog-soap:1.0
+    ports:
+      - "${LEGACY_SOAP_PORT:-8091}:8091"
+    environment:
+      LEGACY_DELAY_MS: "${LEGACY_DELAY_MS:-0}"
+      LEGACY_DUMP: "true"

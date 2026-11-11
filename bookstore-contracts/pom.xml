@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>vn.edu.bookstore</groupId>
+    <artifactId>bookstore-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>bookstore-contracts</artifactId>
+  <name>bookstore-contracts (XSD + JAXB)</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Sinh lớp Java từ XSD (contract-first cho dữ liệu) -->
+      <plugin>
+        <groupId>org.jvnet.jaxb</groupId>
+        <artifactId>jaxb-maven-plugin</artifactId>
+        <version>4.0.16</version>
+        <executions>
+          <execution>
+            <id>xjc-bookstore</id>
+            <goals><goal>generate</goal></goals>
+            <configuration>
+              <schemaDirectory>src/main/resources/xsd</schemaDirectory>
+              <schemaIncludes>
+                <include>bookstore-catalog-v1.xsd</include>
+                <include>bookstore-order-v1.xsd</include>
+              </schemaIncludes>
+              <bindingDirectory>src/main/resources/xsd</bindingDirectory>
+              <bindingIncludes><include>bindings.xjb</include></bindingIncludes>
+              <noFileHeader>true</noFileHeader>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

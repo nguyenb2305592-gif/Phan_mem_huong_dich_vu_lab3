@@ -1,0 +1,263 @@
+openapi: 3.1.0
+info:
+  title: BookStore Catalog API
+  version: 1.0.0
+  description: |
+    API danh mục sách của BookStore (CT230 v7, TH2). Hợp đồng được review TRƯỚC khi viết mã;
+    interface Java sinh từ tệp này bằng openapi-generator (interfaceOnly).
+    Lỗi trả về theo RFC 9457 (application/problem+json).
+  contact:
+    name: Nhóm BookStore
+    url: https://api.bookstore.vn
+servers:
+  - url: https://api.bookstore.vn
+    description: Môi trường mẫu (tên miền tài liệu)
+  - url: http://localhost:8081
+    description: Máy cục bộ
+tags:
+  - name: books
+    description: Danh mục sách
+paths:
+  /api/v1/books:
+    get:
+      tags: [books]
+      operationId: listBooks
+      summary: Liệt kê sách có phân trang theo số trang
+      parameters:
+        - name: q
+          in: query
+          description: Từ khoá tìm trong tiêu đề hoặc tác giả (không phân biệt hoa thường)
+          schema: { type: string, maxLength: 100 }
+        - name: page
+          in: query
+          description: Số trang, bắt đầu từ 0
+          schema: { type: integer, format: int32, minimum: 0, default: 0 }
+        - name: size
+          in: query
+          description: Số phần tử mỗi trang
+          schema: { type: integer, format: int32, minimum: 1, maximum: 100, default: 20 }
+        - name: sort
+          in: query
+          description: "Trường sắp xếp và chiều, ví dụ title,asc hoặc price,desc"
+          schema:
+            type: string
+            pattern: '^(title|price|publishedYear)(,(asc|desc))?$'
+            default: title,asc
+      responses:
+        '200':
+          description: Một trang sách
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BookPage' }
+        '400':
+          $ref: '#/components/responses/ValidationFailed'
+    post:
+      tags: [books]
+      operationId: createBook
+      summary: Thêm sách mới
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BookCreateRequest' }
+            example:
+              isbn: '9781098100131'
+              title: Software Architecture The Hard Parts
+              author: Neal Ford
+              publishedYear: 2021
+              price: { amount: 640000.00, currency: VND }
+      responses:
+        '201':
+          description: Đã tạo
+          headers:
+            Location:
+              schema: { type: string, format: uri }
+            ETag:
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Book' }
+        '400':
+          $ref: '#/components/responses/ValidationFailed'
+        '409':
+          description: ISBN đã tồn tại
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+  /api/v1/books/{isbn}:
+    parameters:
+      - $ref: '#/components/parameters/Isbn'
+    get:
+      tags: [books]
+      operationId: getBook
+      summary: Lấy một sách theo ISBN (hỗ trợ yêu cầu có điều kiện)
+      parameters:
+        - name: If-None-Match
+          in: header
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Sách
+          headers:
+            ETag:
+              description: Phiên bản biểu diễn, dạng "<version>"
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Book' }
+        '304':
+          description: Biểu diễn không đổi so với If-None-Match
+        '404':
+          $ref: '#/components/responses/BookNotFound'
+    put:
+      tags: [books]
+      operationId: updateBook
+      summary: Cập nhật sách (bắt buộc If-Match để tránh ghi đè mất dữ liệu)
+      parameters:
+        - name: If-Match
+          in: header
+          required: false
+          description: ETag đã đọc trước đó; thiếu → 428, lệch → 412
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BookUpdateRequest' }
+      responses:
+        '200':
+          description: Đã cập nhật
+          headers:
+            ETag:
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Book' }
+        '400':
+          $ref: '#/components/responses/ValidationFailed'
+        '404':
+          $ref: '#/components/responses/BookNotFound'
+        '412':
+          description: ETag không khớp (đã có người sửa trước)
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+        '428':
+          description: Thiếu If-Match
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+    delete:
+      tags: [books]
+      operationId: deleteBook
+      summary: Xoá sách
+      responses:
+        '204':
+          description: Đã xoá
+        '404':
+          $ref: '#/components/responses/BookNotFound'
+components:
+  parameters:
+    Isbn:
+      name: isbn
+      in: path
+      required: true
+      schema: { $ref: '#/components/schemas/Isbn13' }
+  responses:
+    BookNotFound:
+      description: Không tìm thấy sách
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+          example:
+            type: https://api.bookstore.vn/problems/book-not-found
+            title: Không tìm thấy sách
+            status: 404
+            detail: Không có sách ISBN 9789999999999
+            instance: /api/v1/books/9789999999999
+    ValidationFailed:
+      description: Dữ liệu không hợp lệ
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+  schemas:
+    Isbn13:
+      type: string
+      pattern: '^97[89][0-9]{10}$'
+      examples: ['9780134685991']
+    CurrencyCode:
+      type: string
+      enum: [VND, USD]
+    Money:
+      type: object
+      required: [amount, currency]
+      properties:
+        amount:
+          type: number
+          minimum: 0
+          multipleOf: 0.01
+          examples: [285000.00]
+        currency:
+          $ref: '#/components/schemas/CurrencyCode'
+    Book:
+      type: object
+      required: [isbn, title, author, price]
+      properties:
+        isbn: { $ref: '#/components/schemas/Isbn13' }
+        title: { type: string, minLength: 1, maxLength: 255 }
+        author: { type: string, minLength: 1, maxLength: 255 }
+        authorId: { type: integer, format: int64, minimum: 1 }
+        publishedYear: { type: integer, format: int32, minimum: 1450, maximum: 2100 }
+        price: { $ref: '#/components/schemas/Money' }
+    BookCreateRequest:
+      type: object
+      required: [isbn, title, author, price]
+      properties:
+        isbn: { $ref: '#/components/schemas/Isbn13' }
+        title: { type: string, minLength: 1, maxLength: 255 }
+        author: { type: string, minLength: 1, maxLength: 255 }
+        authorId: { type: integer, format: int64, minimum: 1 }
+        publishedYear: { type: integer, format: int32, minimum: 1450, maximum: 2100 }
+        price: { $ref: '#/components/schemas/Money' }
+    BookUpdateRequest:
+      type: object
+      required: [title, author, price]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 255 }
+        author: { type: string, minLength: 1, maxLength: 255 }
+        authorId: { type: integer, format: int64, minimum: 1 }
+        publishedYear: { type: integer, format: int32, minimum: 1450, maximum: 2100 }
+        price: { $ref: '#/components/schemas/Money' }
+    PageMetadata:
+      type: object
+      required: [number, size, totalElements, totalPages]
+      properties:
+        number: { type: integer, format: int32 }
+        size: { type: integer, format: int32 }
+        totalElements: { type: integer, format: int64 }
+        totalPages: { type: integer, format: int32 }
+    BookPage:
+      type: object
+      required: [content, page]
+      properties:
+        content:
+          type: array
+          items: { $ref: '#/components/schemas/Book' }
+        page: { $ref: '#/components/schemas/PageMetadata' }
+    Problem:
+      type: object
+      description: Problem Details theo RFC 9457
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer, format: int32 }
+        detail: { type: string }
+        instance: { type: string, format: uri-reference }
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field: { type: string }
+              message: { type: string }

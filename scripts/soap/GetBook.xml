@@ -1,0 +1,9 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+               xmlns:msg="http://bookstore.edu.vn/catalog/messages/v1">
+  <soap:Header/>
+  <soap:Body>
+    <msg:GetBookRequest>
+      <msg:isbn>9780134685991</msg:isbn>
+    </msg:GetBookRequest>
+  </soap:Body>
+</soap:Envelope>

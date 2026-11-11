@@ -1,0 +1,9 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+               xmlns:msg="http://bookstore.edu.vn/catalog/messages/v1">
+  <soap:Body>
+    <msg:SearchBooksRequest>
+      <msg:keyword>micro</msg:keyword>
+      <msg:maxResults>5</msg:maxResults>
+    </msg:SearchBooksRequest>
+  </soap:Body>
+</soap:Envelope>

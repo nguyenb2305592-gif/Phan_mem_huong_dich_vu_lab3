@@ -1,0 +1,44 @@
+# Hạ tầng phát triển cục bộ (TH3): 3 CSDL riêng cho 3 dịch vụ (mỗi dịch vụ sở hữu dữ liệu của mình)
+#   docker compose up -d
+# Các dịch vụ Spring chạy bằng ./mvnw -pl <module> spring-boot:run (xem README)
+name: bookstore
+services:
+  catalog-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: catalog
+      POSTGRES_USER: catalog
+      POSTGRES_PASSWORD: ${CATALOG_DB_PASSWORD:-catalog-lab}
+    ports:
+      - "${CATALOG_DB_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U catalog -d catalog"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  order-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: order
+      POSTGRES_USER: order
+      POSTGRES_PASSWORD: ${ORDER_DB_PASSWORD:-order-lab}
+    ports:
+      - "${ORDER_DB_PORT:-5434}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U order -d order"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  inventory-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: inventory
+      POSTGRES_USER: inventory
+      POSTGRES_PASSWORD: ${INVENTORY_DB_PASSWORD:-inventory-lab}
+    ports:
+      - "${INVENTORY_DB_PORT:-5435}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U inventory -d inventory"]
+      interval: 5s
+      timeout: 3s
+      retries: 10

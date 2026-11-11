@@ -1,0 +1,4 @@
+# Cấu hình riêng của inventory-service
+info:
+  service:
+    description: Tồn kho

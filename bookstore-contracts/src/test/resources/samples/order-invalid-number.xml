@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ord:Order xmlns:ord="http://bookstore.edu.vn/order/v1"
+           xmlns:bs="http://bookstore.edu.vn/catalog/v1" id="1001">
+  <ord:orderNumber>ORD-26-417</ord:orderNumber>
+  <ord:customerId>88</ord:customerId>
+  <ord:orderDate>2026-11-02T09:15:00+07:00</ord:orderDate>
+  <ord:status>NEW</ord:status>
+  <ord:line>
+    <ord:isbn>9780134685991</ord:isbn>
+    <ord:quantity>1</ord:quantity>
+    <ord:unitPrice><bs:amount>285000.00</bs:amount><bs:currency>VND</bs:currency></ord:unitPrice>
+  </ord:line>
+  <ord:line>
+    <ord:isbn>9781617294549</ord:isbn>
+    <ord:quantity>2</ord:quantity>
+    <ord:unitPrice><bs:amount>520000.00</bs:amount><bs:currency>VND</bs:currency></ord:unitPrice>
+  </ord:line>
+  <ord:total><bs:amount>1325000.00</bs:amount><bs:currency>VND</bs:currency></ord:total>
+</ord:Order>

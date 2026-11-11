@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Lược đồ đơn hàng BookStore v1 (tiền tố ord), tái sử dụng kiểu bs:Isbn13 và bs:Money -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:bs="http://bookstore.edu.vn/catalog/v1"
+           xmlns:ord="http://bookstore.edu.vn/order/v1"
+           targetNamespace="http://bookstore.edu.vn/order/v1"
+           elementFormDefault="qualified"
+           version="1.0">
+
+  <xs:import namespace="http://bookstore.edu.vn/catalog/v1" schemaLocation="bookstore-catalog-v1.xsd"/>
+
+  <xs:simpleType name="OrderNumber">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="ORD-[0-9]{4}-[0-9]{6}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="OrderStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NEW"/>
+      <xs:enumeration value="PAID"/>
+      <xs:enumeration value="SHIPPED"/>
+      <xs:enumeration value="CANCELLED"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="OrderLine">
+    <xs:sequence>
+      <xs:element name="isbn" type="bs:Isbn13"/>
+      <xs:element name="quantity" type="xs:positiveInteger"/>
+      <xs:element name="unitPrice" type="bs:Money"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Order">
+    <xs:sequence>
+      <xs:element name="orderNumber" type="ord:OrderNumber"/>
+      <xs:element name="customerId" type="xs:positiveInteger"/>
+      <!-- Ngày giờ phải có độ lệch múi giờ, ví dụ 2026-11-02T09:15:00+07:00 -->
+      <xs:element name="orderDate" type="xs:dateTime"/>
+      <xs:element name="status" type="ord:OrderStatus"/>
+      <xs:element name="line" type="ord:OrderLine" maxOccurs="unbounded"/>
+      <xs:element name="total" type="bs:Money"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:long" use="required"/>
+  </xs:complexType>
+
+  <xs:element name="Order" type="ord:Order"/>
+</xs:schema>
